@@ -16,11 +16,25 @@ afterEach(() => {
   wrapped.unmount();
 });
 
-it('has a textarea that the user can type in synced with react', () => {
-  wrapped.find('textarea').simulate('change', {
-    target: { value: 'new comment' }, //simlating the event.target.value change
+//unite the two tests concerning the textarea in the same describe block, use separate beforeEach
+describe('the textarea', () => {
+  beforeEach(() => {
+    wrapped.find('textarea').simulate('change', {
+      target: { value: 'new comment' }, //simlating the event.target.value change
+    });
+    wrapped.update();
+
+  })
+  it('has a textarea that the user can type in synced with react', () => {
+    expect(wrapped.find('textarea').prop('value')).toEqual('new comment');
   });
-  //force component re-render in order to avoid async re-render (setState)
-  wrapped.update();
-  expect(wrapped.find('textarea').prop('value')).toEqual('new comment');
-});
+  it('when form is submitted, textarea gets emptied', () => {
+    
+    expect(wrapped.find('textarea').prop('value')).toEqual('new comment');
+    wrapped.find('form').simulate('submit');
+    //force component update because form submission is async
+    wrapped.update();
+    expect(wrapped.find('textarea').prop('value')).toEqual('');
+  })
+})
+
